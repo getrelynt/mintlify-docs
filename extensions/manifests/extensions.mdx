@@ -1,0 +1,112 @@
+---
+title: "Extensions & capabilities"
+description: "Define capabilities with input/output schemas and bindings."
+---
+
+Extension manifests (`kind: Extension`) declare **capabilities** — typed operations with JSON Schema input/output and a binding that routes execution.
+
+## Single-capability extension
+
+When `spec` is a capability definition directly, the capability name equals `metadata.name`:
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Extension
+metadata:
+  name: classify-email
+  version: 1.0.0
+spec:
+  input:
+    type: object
+    required: [messageId, subject, bodyText]
+    properties:
+      messageId: { type: string }
+      subject: { type: string }
+      bodyText: { type: string }
+  output:
+    type: object
+    required: [classification, priority, confidence]
+    properties:
+      classification: { type: string }
+      priority: { type: string }
+      confidence: { type: number }
+  binding:
+    type: endpoint
+    connection: classify-email-dev
+    body:
+      messageId: input.messageId
+      subject: input.subject
+      bodyText: input.bodyText
+  exposeAsTool: true
+```
+
+## Multi-capability extension
+
+Declare multiple capabilities in `spec.capabilities[]`:
+
+```yaml
+spec:
+  capabilities:
+    - name: send-notification
+      input: { ... }
+      output: { ... }
+      binding: { ... }
+    - name: lookup-customer
+      input: { ... }
+      output: { ... }
+      binding: { ... }
+```
+
+## Binding types
+
+### Endpoint binding
+
+Routes execution to an org-configured webhook endpoint via an extension connection:
+
+```yaml
+binding:
+  type: endpoint
+  connection: my-connection-key
+  body:
+    field: input.field
+```
+
+Organizations create connections with `POST /v1/extension-connections`. The `connection` value must match the `connection_key` registered for the org.
+
+### HTTP binding
+
+Makes a direct outbound HTTP request:
+
+```yaml
+binding:
+  type: http
+  method: POST
+  url: https://api.example.com/messages/${input.messageId}
+  headers:
+    Content-Type: application/json
+  body: to_json(input)
+  allowedHosts:
+    - api.example.com
+```
+
+HTTP bindings require `allowedHosts` for security. URLs support `${...}` CEL interpolation.
+
+## Response mapping
+
+Map HTTP responses to capability output with CEL in the `capability.response` context:
+
+```yaml
+responseMapping:
+  status: response.status
+  data: parse_json(response.body)
+```
+
+## exposeAsTool
+
+Set `exposeAsTool: true` to make the capability available as an AI agent tool at runtime.
+
+## Related
+
+- [HTTP capability example](/extensions/examples/http-capability)
+- [CEL expressions](/extensions/manifests/cel)
+- [Extension connections API](/api/graphql/extensions)

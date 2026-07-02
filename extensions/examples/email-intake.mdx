@@ -1,0 +1,115 @@
+---
+title: "Email intake workflow"
+description: "Classify inbound email with branching and human review."
+---
+
+This example combines a classify capability with an intake workflow that branches on confidence and routes low-confidence items to human review.
+
+## Bundle files
+
+```
+manifests/
+  classify-capability.yaml    # Extension
+  intake-workflow.yaml        # Workflow
+```
+
+## Classify capability
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Extension
+metadata:
+  name: classify-email
+  version: 1.0.0
+  description: Classify inbound email by subject and body
+spec:
+  input:
+    type: object
+    required: [messageId, subject, bodyText]
+    properties:
+      messageId:
+        type: string
+      subject:
+        type: string
+      bodyText:
+        type: string
+  output:
+    type: object
+    required: [classification, priority, confidence]
+    properties:
+      classification:
+        type: string
+      priority:
+        type: string
+      confidence:
+        type: number
+  binding:
+    type: endpoint
+    connection: classify-email-dev
+    body:
+      messageId: input.messageId
+      subject: input.subject
+      bodyText: input.bodyText
+  exposeAsTool: true
+```
+
+## Intake workflow
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Workflow
+metadata:
+  name: invoice-intake
+  version: 1.0.0
+  description: Intake workflow for invoice-related emails
+spec:
+  trigger:
+    event: email.received
+  match: 'message.subject.contains("invoice") || "acme.com" in participant_domains(message)'
+  priority: 10
+  statusMappings:
+    - phase: new
+      label: Open
+  start: classify
+  steps:
+    - id: classify
+      type: Capability
+      capability: classify-email
+      input:
+        messageId: message.id
+        subject: message.subject
+        bodyText: message.bodyText
+      next: triage
+    - id: triage
+      type: Branch
+      condition: step.outputs.classify.confidence >= 0.8
+      next: auto_route
+      onFalse: manual_review
+    - id: auto_route
+      type: Terminate
+    - id: manual_review
+      type: Human
+      assignee: ops-team
+      statusMappings:
+        - phase: waiting
+          label: Awaiting Review
+      next: auto_route
+```
+
+## Key patterns
+
+- **Intake match** filters which emails trigger this workflow
+- **Capability step** passes message fields as capability input
+- **Branch step** routes on `step.outputs.classify.confidence`
+- **Human step** assigns to a team with a custom status label
+
+## Try it
+
+```bash
+relynt validate ./manifests
+```
+
+## Related
+
+- [Workflows](/extensions/manifests/workflows)
+- [Full bundle example](/extensions/examples/full-bundle)

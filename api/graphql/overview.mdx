@@ -1,0 +1,71 @@
+---
+title: "GraphQL overview"
+description: "Using the Relynt GraphQL API for extension operations."
+---
+
+Relynt's primary client API is GraphQL at `POST /graphql`. This page covers authentication and transport; see [GraphQL extensions](/api/graphql/extensions) for extension-specific operations.
+
+## Endpoint
+
+```
+POST https://api.relynt.com/graphql
+```
+
+## Authentication
+
+Same Auth0 JWT as REST:
+
+```bash
+curl -X POST https://api.relynt.com/graphql \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ extensionInstalls { id extensionName semver status } }"}'
+```
+
+## Transports
+
+| Transport | Support |
+|-----------|---------|
+| POST | Queries and mutations |
+| WebSocket | Subscriptions |
+| SSE | Subscriptions |
+| Multipart | File uploads |
+
+## Playground
+
+A GraphQL playground is available at `/` in development environments only. It is disabled in production.
+
+## Error extensions
+
+GraphQL errors may include:
+
+```json
+{
+  "errors": [
+    {
+      "message": "forbidden",
+      "extensions": {
+        "code": "forbidden",
+        "retryable": false
+      }
+    }
+  ]
+}
+```
+
+## REST equivalents
+
+The CLI uses REST for registry operations. GraphQL provides equivalent operations for client applications:
+
+| Operation | REST | GraphQL |
+|-----------|------|---------|
+| Push bundle | `POST /v1/extensions/bundle` | `pushExtensionBundle` |
+| Install | `POST /v1/extensions/install` | `installExtension` |
+| List versions | `GET /v1/extensions/{name}/versions` | `extensionVersions` |
+| List installs | — | `extensionInstalls` |
+| Connections | `GET /v1/extension-connections` | `extensionConnections` |
+
+## Related
+
+- [GraphQL extensions](/api/graphql/extensions)
+- [Authentication](/api/authentication)

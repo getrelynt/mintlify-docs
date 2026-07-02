@@ -1,0 +1,71 @@
+---
+title: "relynt push"
+description: "Publish an extension bundle to the registry."
+---
+
+Validate locally, then publish an immutable version to the extension registry.
+
+```bash
+relynt push [path]
+```
+
+Default path is `./manifests`.
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON on validation failure |
+
+## Example
+
+```bash
+relynt auth login --org <org-id>
+relynt push ./manifests
+```
+
+## Success output
+
+```
+Published my-extension@1.0.0 (content_hash: a1b2c3...)
+```
+
+## API endpoint
+
+`POST /v1/extensions/bundle`
+
+Request body:
+
+```json
+{
+  "files": [
+    {
+      "name": "extension.yaml",
+      "content": "apiVersion: relynt.com/v1\n..."
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "semver": "1.0.0",
+  "content_hash": "a1b2c3..."
+}
+```
+
+## Error handling
+
+| Status | Meaning |
+|--------|---------|
+| `422` | Validation failed — see `errors` array |
+| `409` | Semver conflict (same version, different content) |
+| `403` | Missing publish permission |
+
+## Related
+
+- [Versioning](/extensions/platform/versioning)
+- [POST /v1/extensions/bundle](/api/overview)

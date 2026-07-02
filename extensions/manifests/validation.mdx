@@ -1,0 +1,62 @@
+---
+title: "Validation"
+description: "How bundle validation works locally and on the server."
+---
+
+Validation runs through the `github.com/getrelynt/manifest` library — the same code path in `relynt validate`, `relynt push`, and the registry API.
+
+## Pipeline stages
+
+```
+Load files → Parse (YAML/JSON) → Canonicalize → Per-manifest validation → Cross-file checks
+```
+
+### Per-manifest validation
+
+1. **Structural** — JSON Schema on envelope + kind-specific `spec`
+2. **CEL type-check** — expressions validated against their context
+3. **Reference integrity** — step IDs, capability refs, knowledge attribute refs, panel action refs
+
+### Bundle-level validation
+
+- Collect capability names from all Extension manifests
+- Validate each manifest with the full capability name set
+- Check for duplicate `entityType.key` across Knowledge manifests
+
+## Validation modes
+
+| Mode | Use case |
+|------|----------|
+| `ValidateManifest` | Single file; capability refs not resolved |
+| `ValidateManifestWithCompanions` | Single file + companion Extensions |
+| `ValidateBundle` | Full bundle directory (what `relynt validate` uses) |
+
+## Running validation
+
+```bash
+relynt validate ./manifests
+relynt validate ./manifests --json
+```
+
+JSON output shape:
+
+```json
+{
+  "errors": [
+    {
+      "path": "spec.steps[0].capability",
+      "code": "missing_capability_ref",
+      "message": "capability \"foo\" not found in bundle"
+    }
+  ]
+}
+```
+
+## Server validation
+
+`relynt push` and `POST /v1/extensions/bundle` re-validate on the server. Validation failures return HTTP `422` with the same error shape.
+
+## Related
+
+- [Validation error codes](/extensions/troubleshooting/validation-errors)
+- [Common fixes](/extensions/troubleshooting/common-fixes)

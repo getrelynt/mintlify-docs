@@ -1,0 +1,51 @@
+---
+title: "HTTP capability"
+description: "Outbound HTTP binding with CEL interpolation."
+---
+
+This example shows a capability that makes a direct HTTP POST with URL interpolation and JSON body serialization.
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Extension
+metadata:
+  name: notify-http
+  version: 1.0.0
+spec:
+  input:
+    type: object
+    required: [messageId]
+    properties:
+      messageId:
+        type: string
+  output:
+    type: object
+    properties:
+      status:
+        type: string
+  binding:
+    type: http
+    method: POST
+    url: https://api.example.com/messages/${input.messageId}
+    headers:
+      Content-Type: application/json
+    body: to_json(input)
+  exposeAsTool: false
+```
+
+## Key patterns
+
+| Pattern | Detail |
+|---------|--------|
+| URL interpolation | `${input.messageId}` validated as CEL in `capability.binding` context |
+| Body serialization | `to_json(input)` converts the input map to a JSON string |
+| `allowedHosts` | Required in production bindings — add host allowlist for security |
+
+<Note>
+  This example omits `allowedHosts` for brevity. Production manifests must declare allowed hosts.
+</Note>
+
+## Related
+
+- [Extensions & capabilities](/extensions/manifests/extensions)
+- [CEL expressions](/extensions/manifests/cel)

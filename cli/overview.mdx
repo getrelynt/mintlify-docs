@@ -1,0 +1,63 @@
+---
+title: "CLI overview"
+description: "Install and use the relynt CLI for extension development."
+---
+
+The `relynt` CLI validates extension bundles locally and deploys immutable versions to the Relynt extension registry.
+
+## Install
+
+Download from [GitHub Releases](https://github.com/getrelynt/relynt-cli/releases) or build from source:
+
+```bash
+git clone https://github.com/getrelynt/relynt-cli.git
+cd relynt-cli
+task build
+./bin/relynt --version
+```
+
+## Global flags
+
+| Flag | Description |
+|------|-------------|
+| `-v`, `--verbose` | Verbose output |
+| `--api-url` | Override API base URL (dev builds only) |
+| `--version` | Print build version |
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| [`relynt auth`](/cli/auth) | Authenticate via Auth0 device flow |
+| [`relynt init`](/cli/init) | Scaffold a new extension bundle |
+| [`relynt validate`](/cli/validate) | Validate a bundle locally |
+| [`relynt push`](/cli/push) | Publish to the registry |
+| [`relynt versions`](/cli/versions) | List published versions |
+| [`relynt diff`](/cli/diff) | Compare two versions |
+| [`relynt install`](/cli/install) | Install a version for your org |
+| `relynt uninstall` | Uninstall from your org |
+| [`relynt logs`](/cli/logs) | Stream deployment and runtime logs |
+
+## Typical workflow
+
+```bash
+relynt init --name my-extension
+relynt validate ./manifests
+relynt auth login --org <org-id>
+relynt push ./manifests
+relynt install my-extension@0.1.0
+```
+
+## Dev vs release builds
+
+| Build | Config | Env overrides |
+|-------|--------|---------------|
+| Release binary | Embedded at build time | Not supported |
+| Dev build (`task build`) | From env / Doppler | `--api-url` supported |
+
+See [Local development](/extensions/local-development) for Doppler setup.
+
+## Related
+
+- [Quickstart](/extensions/quickstart)
+- [API reference](/api/overview)

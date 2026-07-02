@@ -1,0 +1,46 @@
+---
+title: "relynt install"
+description: "Install an extension version for your organization."
+---
+
+Pin a published extension version for the authenticated organization.
+
+```bash
+relynt install [name@version]
+```
+
+## Example
+
+```bash
+relynt install my-extension@1.0.0
+```
+
+## What happens on install
+
+- Capabilities are registered in the org capability catalog
+- Knowledge entity types become available for sync
+- Panels are resolved at runtime for matching work items
+- Workflow manifests are stored but **not auto-imported**
+
+## API endpoint
+
+`POST /v1/extensions/install`
+
+```json
+{
+  "extension_name": "my-extension",
+  "semver": "1.0.0"
+}
+```
+
+## Uninstall
+
+```bash
+relynt uninstall <install-id>
+```
+
+Calls `POST /v1/extensions/uninstall` with the install UUID.
+
+## Related
+
+- [Lifecycle](/extensions/platform/lifecycle)

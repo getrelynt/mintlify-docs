@@ -1,0 +1,77 @@
+---
+title: "Errors"
+description: "HTTP status codes and error response formats."
+---
+
+## Validation errors (422)
+
+Manifest validation failures return HTTP `422 Unprocessable Entity`:
+
+```json
+{
+  "errors": [
+    {
+      "path": "spec.steps[0].capability",
+      "code": "missing_capability_ref",
+      "message": "capability \"classify-email\" not found in bundle"
+    }
+  ]
+}
+```
+
+Each error has:
+
+| Field | Description |
+|-------|-------------|
+| `path` | JSON path to the failing field |
+| `code` | Machine-readable error code |
+| `message` | Human-readable description |
+
+See the full [validation error code reference](/extensions/troubleshooting/validation-errors).
+
+## General errors
+
+Non-validation failures return a simple error object:
+
+```json
+{
+  "error": "extension not found"
+}
+```
+
+## HTTP status codes
+
+| Status | Meaning |
+|--------|---------|
+| `200` | Success |
+| `201` | Created (extension connection) |
+| `204` | No content (disconnect connection) |
+| `400` | Bad request (invalid JSON, missing parameters) |
+| `401` | Unauthorized (missing or invalid token) |
+| `403` | Forbidden (missing entitlement or permission) |
+| `404` | Not found (extension, version, or install) |
+| `409` | Conflict (semver exists with different content hash) |
+| `422` | Validation failed |
+
+## GraphQL errors
+
+GraphQL errors include extensions:
+
+| Extension | Values |
+|-----------|--------|
+| `code` | `forbidden`, `pdp_unavailable`, `internal_error` |
+| `retryable` | Boolean indicating if the client should retry |
+
+## CLI parity
+
+The CLI surfaces the same validation errors:
+
+```bash
+relynt validate ./manifests --json
+relynt push ./manifests --json
+```
+
+## Related
+
+- [Validation error codes](/extensions/troubleshooting/validation-errors)
+- [Common fixes](/extensions/troubleshooting/common-fixes)

@@ -1,0 +1,48 @@
+---
+title: "relynt init"
+description: "Scaffold a new extension bundle."
+---
+
+Create a starter extension bundle with the required directory structure.
+
+```bash
+relynt init --name my-extension
+```
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--name` | (required) | Extension name (kebab-case) |
+| `--version` | `0.1.0` | Initial semver |
+| `--dir` | `manifests` | Output directory |
+
+## Generated structure
+
+```
+manifests/
+  extension.yaml
+  capabilities/
+  workflows/
+```
+
+The starter `extension.yaml` includes a minimal `kind: Extension` manifest with your chosen name and version.
+
+## Example
+
+```bash
+relynt init --name invoice-processor --version 1.0.0 --dir manifests
+```
+
+## Next steps
+
+Edit the generated manifests, then validate:
+
+```bash
+relynt validate ./manifests
+```
+
+## Related
+
+- [Quickstart](/extensions/quickstart)
+- [Bundle layout](/extensions/platform/bundle-layout)

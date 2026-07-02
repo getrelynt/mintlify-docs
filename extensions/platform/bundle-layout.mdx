@@ -1,0 +1,64 @@
+---
+title: "Bundle layout"
+description: "Directory structure and conventions for extension bundles."
+---
+
+An extension bundle is a **directory of manifest files** (`.yaml`, `.yml`, or `.json`). The CLI walks the tree recursively and loads all matching files.
+
+## Scaffolded layout
+
+`relynt init` creates this structure:
+
+```
+manifests/
+  extension.yaml          # kind: Extension (bundle identity)
+  capabilities/           # optional subdirectory
+  workflows/              # optional subdirectory
+```
+
+## Typical production bundle
+
+```
+my-extension/
+  manifests/
+    extension.yaml              # Extension manifest (required for push)
+    classify-capability.yaml    # additional Extension (optional)
+    intake-workflow.yaml        # Workflow
+    customer-records.yaml       # Knowledge
+    work-item-panel.yaml        # Panel
+```
+
+Subdirectories are optional — flat layouts work equally well:
+
+```
+manifests/
+  extension.yaml
+  intake-workflow.yaml
+  panel-summary.yaml
+```
+
+## Bundle identity
+
+Push identity comes from the **Extension** manifest:
+
+| Field | Role |
+|-------|------|
+| `metadata.name` | Extension name (kebab-case) |
+| `metadata.version` | Semver for this push |
+
+All other manifests in the bundle are companions. Their `metadata.name` values are independent identifiers within the bundle.
+
+## File naming conventions
+
+- Use kebab-case filenames matching `metadata.name` where practical
+- One manifest per file (do not combine kinds in a single file)
+- YAML is preferred; JSON is also accepted
+
+## Multi-capability extensions
+
+A single Extension manifest can declare multiple capabilities via `spec.capabilities[]`. Alternatively, split capabilities across separate Extension manifests in the same bundle — both patterns are valid.
+
+## Related
+
+- [Manifest envelope](/extensions/manifests/envelope)
+- [Full bundle example](/extensions/examples/full-bundle)

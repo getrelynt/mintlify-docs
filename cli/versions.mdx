@@ -1,0 +1,44 @@
+---
+title: "relynt versions"
+description: "List published versions of an extension."
+---
+
+```bash
+relynt versions [name]
+```
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON |
+
+## Example
+
+```bash
+relynt versions my-extension
+```
+
+## JSON output
+
+```json
+{
+  "versions": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "semver": "1.0.0",
+      "content_hash": "a1b2c3...",
+      "published_at": "2026-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+## API endpoint
+
+`GET /v1/extensions/{name}/versions`
+
+## Related
+
+- [Versioning](/extensions/platform/versioning)
+- [relynt diff](/cli/diff)

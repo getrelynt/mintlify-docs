@@ -1,0 +1,65 @@
+---
+title: "Versioning"
+description: "Semver, content hashing, and immutable extension versions."
+---
+
+## Semver versions
+
+Each push targets a semver from the Extension manifest's `metadata.version`:
+
+```yaml
+metadata:
+  name: my-extension
+  version: 1.2.0
+```
+
+Published versions are **immutable**. To ship changes, bump the semver and push again.
+
+## Content hash
+
+The server computes a SHA-256 hash from the **canonical JSON** of all manifests in the bundle (sorted by filename). The hash is returned on push:
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "semver": "1.2.0",
+  "content_hash": "a1b2c3..."
+}
+```
+
+## Conflict rules
+
+| Scenario | Result |
+|----------|--------|
+| Push same semver, identical content | Idempotent — returns existing version |
+| Push same semver, different content | `409 Conflict` |
+| Push new semver | New version created |
+
+<Note>
+  You cannot overwrite a published version. Bump semver for any content change.
+</Note>
+
+## Listing and diffing versions
+
+```bash
+relynt versions my-extension
+relynt diff my-extension 1.0.0 1.1.0
+```
+
+The diff endpoint compares manifest files between two versions and reports added, removed, and modified files.
+
+## Installing a specific version
+
+Pin a version for your organization:
+
+```bash
+relynt install my-extension@1.1.0
+```
+
+Only published versions can be installed. The install record tracks which semver is active for the org.
+
+## Related
+
+- [CLI versions](/cli/versions)
+- [CLI diff](/cli/diff)
+- [REST: List versions](/api/overview)

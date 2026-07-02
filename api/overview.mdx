@@ -1,0 +1,66 @@
+---
+title: "API overview"
+description: "REST and GraphQL APIs for the Relynt extension platform."
+---
+
+The Relynt API provides REST endpoints for the extension registry and GraphQL for richer client integrations.
+
+## Base URL
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://api.relynt.com/v1` |
+| GraphQL | `https://api.relynt.com/graphql` |
+
+## Authentication
+
+All extension endpoints require a valid **Auth0 JWT** with organization context. See [Authentication](/api/authentication).
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  https://api.relynt.com/v1/extensions/my-extension/versions
+```
+
+## API surfaces
+
+| Surface | Use case |
+|---------|----------|
+| **REST** (`/v1/extensions/*`) | Registry operations used by the CLI |
+| **REST** (`/v1/extension-connections/*`) | Webhook-signed capability connections |
+| **GraphQL** (`/graphql`) | Extension installs, connections, knowledge sync |
+
+This documentation covers **extensions-focused** APIs. The full platform GraphQL schema includes additional domains (ingest, workflows, billing, AI) not documented here.
+
+## Error format
+
+| Status | Body shape |
+|--------|------------|
+| `422` | `{ "errors": [{ "path", "code", "message" }] }` |
+| Other | `{ "error": "message" }` |
+
+See [Errors](/api/errors).
+
+## REST endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/v1/extensions/bundle` | Push bundle |
+| POST | `/v1/extensions/install` | Install version |
+| POST | `/v1/extensions/uninstall` | Uninstall |
+| GET | `/v1/extensions/{name}/versions` | List versions |
+| GET | `/v1/extensions/{name}/diff` | Diff versions |
+| GET | `/v1/extensions/{name}/logs` | List logs |
+| POST | `/v1/extension-connections` | Create connection |
+| GET | `/v1/extension-connections` | List connections |
+| DELETE | `/v1/extension-connections/{id}` | Disconnect |
+
+Interactive reference pages are available in the sidebar under **REST — Extensions** and **REST — Connections**.
+
+## GraphQL
+
+Extension-related queries and mutations are documented in [GraphQL extensions](/api/graphql/extensions).
+
+## Related
+
+- [Authentication](/api/authentication)
+- [CLI overview](/cli/overview)

@@ -1,0 +1,63 @@
+---
+title: "Authentication"
+description: "Auth0 JWT authentication for API and CLI access."
+---
+
+Relynt uses **Auth0** for authentication. All API requests require a valid access token with organization context.
+
+## CLI authentication
+
+The CLI uses Auth0 **device authorization flow**:
+
+```bash
+relynt auth login --org <org-id>
+```
+
+Credentials are stored in the system keyring with a file fallback. The CLI automatically refreshes access tokens.
+
+Verify your session:
+
+```bash
+relynt auth whoami
+```
+
+## API authentication
+
+Include the access token as a Bearer header:
+
+```bash
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+  https://api.relynt.com/v1/extensions/my-extension/versions
+```
+
+## Organization context
+
+The JWT must include an **organization claim** matching the org you are operating on. The CLI sets this via `--org` at login time.
+
+Extension registry operations are scoped to the authenticated organization:
+
+- **Push** publishes versions to the org's extension namespace
+- **Install** pins a version for the org
+- **Connections** are org-scoped webhook endpoints
+
+## Token refresh
+
+The CLI handles token refresh automatically. For direct API integration, refresh tokens before expiry using Auth0's token endpoint.
+
+## Dev vs production
+
+| Build | Auth0 config |
+|-------|--------------|
+| Release CLI binary | Embedded at build time |
+| Dev build | `RELYNT_AUTH0_*` env vars via Doppler |
+
+See [Local development](/extensions/local-development).
+
+## Service tokens
+
+Machine-to-machine access uses service tokens (`GET/POST /v1/service-tokens`). Service token management is outside the extensions API scope documented here.
+
+## Related
+
+- [CLI auth](/cli/auth)
+- [API overview](/api/overview)

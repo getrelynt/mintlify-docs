@@ -1,0 +1,51 @@
+---
+title: "Manifest envelope"
+description: "Shared structure for all Relynt manifest kinds."
+---
+
+Every manifest file shares a Kubernetes-style envelope validated against `relynt.com/v1`.
+
+## Required fields
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Extension          # Extension | Workflow | Knowledge | Panel
+metadata:
+  name: my-capability    # kebab-case: ^[a-z][a-z0-9-]*$
+  version: 1.0.0         # semver
+spec:
+  # kind-specific content
+```
+
+## Metadata
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Unique identifier within the manifest kind; kebab-case |
+| `version` | Yes | Semver string |
+| `description` | No | Human-readable summary |
+| `labels` | No | String key-value map for organization |
+
+## Manifest kinds
+
+| `kind` | `spec` schema |
+|--------|---------------|
+| `Extension` | Capability spec or multi-capability bundle |
+| `Workflow` | Trigger, steps, status mappings |
+| `Knowledge` | Entity type and sync mapping |
+| `Panel` | Surface, components, actions |
+
+## Naming rules
+
+- `metadata.name` must match `^[a-z][a-z0-9-]*$` (lowercase, hyphens allowed)
+- Extension manifest `metadata.name` + `metadata.version` define bundle push identity
+- Capability names referenced in workflows must match Extension declarations in the same bundle
+
+## File format
+
+Manifests accept YAML (`.yaml`, `.yml`) or JSON (`.json`). The validator normalizes to canonical JSON for content hashing.
+
+## Related
+
+- [Validation](/extensions/manifests/validation)
+- [Extensions & capabilities](/extensions/manifests/extensions)

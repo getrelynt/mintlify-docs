@@ -1,0 +1,66 @@
+---
+title: "Local development"
+description: "Set up the Relynt CLI for local development and staging."
+---
+
+## Install the CLI
+
+Download the latest release from [GitHub Releases](https://github.com/getrelynt/relynt-cli/releases) or build from source:
+
+```bash
+git clone https://github.com/getrelynt/relynt-cli.git
+cd relynt-cli
+go mod download
+task build
+./bin/relynt --version
+```
+
+## Release vs dev builds
+
+| Build type | Config source | Env overrides |
+|------------|---------------|---------------|
+| **Release binary** | Embedded at build time (Auth0 + API URL) | Not supported |
+| **Dev build** (`task build`) | Env vars or Doppler | `--api-url` flag supported |
+
+Release binaries are production-ready. Dev builds let you point at staging or local API endpoints.
+
+## Authentication setup (dev/staging)
+
+For local development, configure environment variables via [Doppler](https://www.doppler.com/) or export them directly:
+
+```bash
+doppler setup --project relynt-cli --config dev
+doppler run -- task build
+doppler run -- ./bin/relynt auth login --org <org-id>
+```
+
+Required variables (see `.env.example` in the CLI repo):
+
+| Variable | Purpose |
+|----------|---------|
+| `RELYNT_AUTH0_DOMAIN` | Auth0 tenant domain |
+| `RELYNT_AUTH0_CLIENT_ID` | Auth0 application client ID |
+| `RELYNT_AUTH0_AUDIENCE` | Auth0 API audience |
+| `RELYNT_API_URL` | Relynt API base URL |
+
+## Override API URL
+
+Dev builds accept the `--api-url` flag on any command:
+
+```bash
+./bin/relynt --api-url https://api.staging.relynt.com push ./manifests
+```
+
+## Validate without publishing
+
+Run validation in CI or pre-commit hooks without network access:
+
+```bash
+relynt validate ./manifests
+relynt validate ./manifests --json
+```
+
+## Related
+
+- [CLI overview](/cli/overview)
+- [Authentication](/api/authentication)

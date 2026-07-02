@@ -1,0 +1,64 @@
+---
+title: "relynt auth"
+description: "Authenticate with Relynt via Auth0 device flow."
+---
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `relynt auth login` | Start Auth0 device authorization flow |
+| `relynt auth logout` | Remove stored credentials |
+| `relynt auth whoami` | Show the authenticated user |
+
+## auth login
+
+```bash
+relynt auth login --org <org-id>
+```
+
+### Flags
+
+| Flag | Description |
+|------|-------------|
+| `--org` | Auth0 organization ID or slug (required) |
+| `--force` | Overwrite existing credentials without prompting |
+
+Opens a browser for Auth0 device flow. Credentials are stored in the system keyring with a file fallback.
+
+### Example
+
+```bash
+relynt auth login --org org_abc123
+relynt auth whoami
+```
+
+## auth logout
+
+```bash
+relynt auth logout
+```
+
+Clears stored credentials from keyring and file store.
+
+## auth whoami
+
+```bash
+relynt auth whoami
+```
+
+Calls `GET /v1/me` and prints the authenticated principal and organization context.
+
+## Dev setup
+
+For local development, use Doppler to inject Auth0 config:
+
+```bash
+doppler run -- ./bin/relynt auth login --org <org-id>
+```
+
+See [Local development](/extensions/local-development).
+
+## Related
+
+- [Authentication](/api/authentication)

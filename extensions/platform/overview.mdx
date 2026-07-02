@@ -1,0 +1,84 @@
+---
+title: "How extensions work"
+description: "Core concepts of the Relynt extensions platform."
+---
+
+Relynt extensions let you extend the platform with **declarative manifests** — no server-side code in your bundle. You define capabilities, workflows, knowledge types, and UI panels in YAML; Relynt validates, stores, and executes them at runtime.
+
+## Extension lifecycle
+
+```mermaid
+sequenceDiagram
+  participant Dev as ExtensionBuilder
+  participant CLI as relynt_CLI
+  participant Manifest as manifest_module
+  participant API as Relynt_API
+  participant Org as Organization
+  Dev->>CLI: validate bundle
+  CLI->>Manifest: ValidateBundle
+  Dev->>CLI: push
+  CLI->>API: POST /v1/extensions/bundle
+  API->>Manifest: re-validate + content hash
+  Dev->>CLI: install name@version
+  CLI->>API: POST /v1/extensions/install
+  API->>Org: pin version + register capabilities
+```
+
+## Manifest kinds
+
+Every file in a bundle is a manifest with a Kubernetes-style envelope:
+
+| Kind | Purpose |
+|------|---------|
+| `Extension` | One or more capabilities with input/output schemas and bindings |
+| `Workflow` | Step graph for automation (email intake, work item triggers) |
+| `Knowledge` | Entity type definitions and sync mappings |
+| `Panel` | Declarative UI components bound with CEL expressions |
+
+All manifests share `apiVersion: relynt.com/v1` and kebab-case `metadata.name` values.
+
+## Cross-file references
+
+Bundles are validated as a unit. References must resolve within the same bundle:
+
+- Workflow `Capability` steps reference capability names declared in Extension manifests
+- Panel `actions[].capability` references the same capability namespace
+- Knowledge `sync.mapping` attributes must exist on the declared entity schema
+
+## Immutable versions
+
+Each push creates an **immutable semver version** identified by a content hash:
+
+- Same semver + same content → idempotent (returns existing version)
+- Same semver + different content → `409 Conflict`
+- New semver → new version appended to the registry
+
+## Org-scoped installs
+
+Publishing registers a version globally. **Installing** pins that version for a specific organization:
+
+- Capabilities become available for workflow builder and panel actions
+- Knowledge entity types are registered for sync
+- Panels are resolved at runtime for matching work items
+
+Workflow manifests in bundles are stored for reference and diffing but are **not auto-imported** on install.
+
+## Extension connections
+
+Capabilities with `binding.type: endpoint` reference a **connection** by key. Organizations create connections via the API to wire your capability to their webhook endpoint:
+
+```yaml
+binding:
+  type: endpoint
+  connection: classify-email-dev
+  body:
+    messageId: input.messageId
+```
+
+See [Extensions & capabilities](/extensions/manifests/extensions) for binding details.
+
+## Related
+
+- [Bundle layout](/extensions/platform/bundle-layout)
+- [Lifecycle](/extensions/platform/lifecycle)
+- [Versioning](/extensions/platform/versioning)

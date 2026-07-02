@@ -1,33 +1,69 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
+# AGENTS.md — Relynt Docs
 
-# Documentation project instructions
+Guidance for AI agents and contributors working on the Relynt documentation site.
 
 ## About this project
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
+- Documentation site built on [Mintlify](https://mintlify.com)
 - Pages are MDX files with YAML frontmatter
 - Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
+- Audience: **extension builders** — developers authoring and publishing Relynt extensions
 
 ## Terminology
 
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+| Term | Usage |
+|------|-------|
+| **extension** | A published package identified by name + semver |
+| **bundle** | Directory of manifest files pushed together |
+| **manifest** | Single YAML/JSON file with `apiVersion`, `kind`, `metadata`, `spec` |
+| **capability** | Typed operation declared in an Extension manifest |
+| **content hash** | SHA-256 of canonicalized bundle content |
+| **install** | Org-scoped pin of a published extension version |
 
-## Style preferences
-
-{/* Add any project-specific style rules below */}
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
+Use "organization" not "org" in prose (except CLI flag names like `--org`).
 
 ## Content boundaries
 
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+**Document:**
+- Extension platform concepts, manifest authoring, CLI, extension REST/GraphQL APIs
+- Validation, CEL, examples from `github.com/getrelynt/manifest` testdata
+
+**Do not document:**
+- Internal ops runbooks (deploy, Datadog, EU plan)
+- Full platform GraphQL (billing, ingest, enterprise) unless scope expands
+- Notion RFC internals — summarize concepts, link to public docs only
+
+## Source material
+
+When updating extension docs, check these repos for accuracy:
+
+| Repo | Content |
+|------|---------|
+| `github.com/getrelynt/manifest` | Schemas, CEL, validation, `docs/`, `testdata/` |
+| `github.com/getrelynt/relynt-cli` | CLI commands, flags, auth setup |
+| `github.com/getrelynt/backend` | REST handlers, GraphQL schema (`internal/graph/schema/extension.graphql`) |
+
+## Style
+
+- Second person, active voice
+- Sentence case for headings
+- Root-relative internal links (`/extensions/quickstart`, no `.mdx` extension)
+- All code blocks must have language tags
+- No emoji, no marketing filler
+
+## Validation
+
+```bash
+mint validate
+mint broken-links
+```
+
+Run before opening PRs.
+
+## Navigation
+
+New pages must be added to `docs.json` navigation or they won't appear in the sidebar. Match existing tab/group structure:
+
+- **Extensions** — platform guides, manifests, examples
+- **CLI** — command reference
+- **API reference** — REST (OpenAPI) + GraphQL

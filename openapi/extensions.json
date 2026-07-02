@@ -1,0 +1,637 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Relynt Extensions API",
+    "description": "REST API for the Relynt extension registry and extension connections. All endpoints require a valid Auth0 JWT with organization context.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.relynt.com/v1",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Auth0 access token with organization claim"
+      }
+    },
+    "schemas": {
+      "BundleFile": {
+        "type": "object",
+        "required": ["name", "content"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Relative path within the bundle (e.g. extension.yaml)"
+          },
+          "content": {
+            "type": "string",
+            "description": "Manifest file contents (YAML or JSON)"
+          }
+        }
+      },
+      "PushBundleRequest": {
+        "type": "object",
+        "required": ["files"],
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BundleFile"
+            }
+          }
+        }
+      },
+      "PushBundleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "semver": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "content_hash": {
+            "type": "string",
+            "description": "SHA-256 hash of canonicalized bundle content"
+          }
+        }
+      },
+      "InstallExtensionRequest": {
+        "type": "object",
+        "required": ["extension_name", "semver"],
+        "properties": {
+          "extension_name": {
+            "type": "string"
+          },
+          "semver": {
+            "type": "string",
+            "example": "1.0.0"
+          }
+        }
+      },
+      "InstallExtensionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "pending", "error"]
+          }
+        }
+      },
+      "UninstallExtensionRequest": {
+        "type": "object",
+        "required": ["install_id"],
+        "properties": {
+          "install_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UninstallExtensionResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExtensionVersion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "semver": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ListVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExtensionVersion"
+            }
+          }
+        }
+      },
+      "ManifestDiff": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "change": {
+            "type": "string",
+            "enum": ["added", "removed", "modified"]
+          }
+        }
+      },
+      "DiffVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "diffs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManifestDiff"
+            }
+          }
+        }
+      },
+      "LogEntry": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ListLogsResponse": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogEntry"
+            }
+          }
+        }
+      },
+      "CreateConnectionRequest": {
+        "type": "object",
+        "required": ["extension_name", "connection_key", "endpoint_url", "signing_key"],
+        "properties": {
+          "extension_name": {
+            "type": "string"
+          },
+          "connection_key": {
+            "type": "string",
+            "description": "Connection reference used in capability bindings"
+          },
+          "endpoint_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "signing_key": {
+            "type": "string",
+            "description": "Shared secret for webhook signature authentication"
+          }
+        }
+      },
+      "ExtensionConnection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "extension_name": {
+            "type": "string"
+          },
+          "connection_key": {
+            "type": "string"
+          },
+          "auth_kind": {
+            "type": "string",
+            "enum": ["webhook_signature", "api_key", "none"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "active", "error", "disconnected"]
+          },
+          "endpoint_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "ListConnectionsResponse": {
+        "type": "object",
+        "properties": {
+          "connections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExtensionConnection"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/extensions/bundle": {
+      "post": {
+        "operationId": "pushExtensionBundle",
+        "summary": "Push extension bundle",
+        "description": "Validate and publish an immutable extension bundle version. Returns 422 with structured validation errors on failure.",
+        "tags": ["Extensions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushBundleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bundle published successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushBundleResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Semver conflict (same version, different content hash)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "curl",
+            "source": "curl -X POST https://api.relynt.com/v1/extensions/bundle \\\n  -H \"Authorization: Bearer $TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"files\":[{\"name\":\"extension.yaml\",\"content\":\"apiVersion: relynt.com/v1\\nkind: Extension\\n...\"}]}'"
+          }
+        ]
+      }
+    },
+    "/extensions/install": {
+      "post": {
+        "operationId": "installExtension",
+        "summary": "Install extension",
+        "description": "Pin a published extension version for the authenticated organization.",
+        "tags": ["Extensions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallExtensionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallExtensionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension or version not found"
+          },
+          "403": {
+            "description": "Forbidden (missing entitlement)"
+          }
+        }
+      }
+    },
+    "/extensions/uninstall": {
+      "post": {
+        "operationId": "uninstallExtension",
+        "summary": "Uninstall extension",
+        "description": "Remove an extension install from the organization.",
+        "tags": ["Extensions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UninstallExtensionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension uninstalled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UninstallExtensionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Install not found"
+          }
+        }
+      }
+    },
+    "/extensions/{name}/versions": {
+      "get": {
+        "operationId": "listExtensionVersions",
+        "summary": "List extension versions",
+        "description": "List all published versions of an extension.",
+        "tags": ["Extensions"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVersionsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found"
+          }
+        }
+      }
+    },
+    "/extensions/{name}/diff": {
+      "get": {
+        "operationId": "diffExtensionVersions",
+        "summary": "Diff extension versions",
+        "description": "Compare manifest files between two published versions.",
+        "tags": ["Extensions"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source semver"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Target semver"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Diff result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiffVersionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing from or to query parameters"
+          },
+          "404": {
+            "description": "Extension or version not found"
+          }
+        }
+      }
+    },
+    "/extensions/{name}/logs": {
+      "get": {
+        "operationId": "listExtensionLogs",
+        "summary": "List extension logs",
+        "description": "Retrieve deployment and runtime log entries for an extension.",
+        "tags": ["Extensions"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "RFC3339 timestamp; only return entries after this time"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Log entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListLogsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Extension not found"
+          }
+        }
+      }
+    },
+    "/extension-connections": {
+      "post": {
+        "operationId": "createExtensionConnection",
+        "summary": "Create extension connection",
+        "description": "Register a webhook-signed endpoint for an extension capability binding.",
+        "tags": ["Connections"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Connection created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtensionConnection"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listExtensionConnections",
+        "summary": "List extension connections",
+        "description": "List all extension connections for the organization.",
+        "tags": ["Connections"],
+        "responses": {
+          "200": {
+            "description": "Connection list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListConnectionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/extension-connections/{id}": {
+      "delete": {
+        "operationId": "disconnectExtensionConnection",
+        "summary": "Disconnect extension connection",
+        "description": "Remove an extension connection.",
+        "tags": ["Connections"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Connection disconnected"
+          },
+          "404": {
+            "description": "Connection not found"
+          }
+        }
+      }
+    }
+  }
+}

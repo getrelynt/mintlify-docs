@@ -1,0 +1,99 @@
+---
+title: "Panels"
+description: "Declarative UI surfaces rendered from CEL bind values."
+---
+
+Panels are `kind: Panel` manifests shipped in extension bundles. Extension builders author YAML locally, validate with `relynt validate`, and deploy with `relynt push`. Relynt renders panels at runtime from resolved bind values — no remote JS.
+
+## Surfaces
+
+| Surface | Use |
+|---------|-----|
+| `work_item_detail` | Primary work item view |
+| `work_item_sidebar` | Compact sidebar alongside a work item |
+| `thread_detail` | Thread-level context |
+
+Optional `spec.match` is a CEL bool evaluated in the `panel.bind` context to filter panels for a given work item / message.
+
+## CEL context (`panel.bind`)
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `workItem` | WorkItem | Current work item (`id`, `phase`, `status`, `priority`, …) |
+| `message` | Message | Context message (`from`, `subject`, `bodyText`, …) |
+
+## Component catalog (v1)
+
+| `type` | Category | Required bind fields |
+|--------|----------|-------------------|
+| `text` | content | `content` (CEL); optional `variant`: `body`, `heading`, `caption`, `label` |
+| `badge` | content | `label` (CEL); optional `tone`: `neutral`, `info`, `success`, `warning`, `danger`, `error` |
+| `field_list` | data | `fields[]` with `label` + `value` (CEL) |
+| `metric` | data | `label`, `value` (CEL); optional `hint` (CEL) |
+| `list` | data | `items[]` — CEL string or `{ label, value }` |
+| `table` | data | `columns[]` (`header`, `accessor` CEL), `rows` (CEL array) |
+| `link` | content | `label`, `href` (CEL); optional `external` bool |
+| `alert` | feedback | `content` (CEL); optional `tone` |
+| `empty_state` | feedback | `title` (CEL); optional `description` (CEL) |
+| `separator` | layout | optional `label` (CEL) |
+| `section` | layout | `components[]` (nested); optional `title` (CEL) |
+| `actions` | interactive | `actions[]` with `label`, `capability`, optional `input` (CEL map), `confirm` |
+
+## Example panel
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Panel
+metadata:
+  name: work-item-summary
+  version: 1.0.0
+spec:
+  surface: work_item_detail
+  match: workItem.phase != 'closed'
+  components:
+    - type: section
+      bind:
+        title: "'Overview'"
+        components:
+          - type: badge
+            bind:
+              label: workItem.status
+              tone: info
+          - type: field_list
+            bind:
+              fields:
+                - label: From
+                  value: message.from
+    - type: actions
+      bind:
+        actions:
+          - label: Classify
+            capability: classify-email
+            input:
+              messageId: message.id
+              subject: message.subject
+              bodyText: message.bodyText
+```
+
+`actions[].capability` must reference a capability declared in a companion Extension manifest in the same bundle.
+
+## Nesting limits
+
+`section` components can nest child components. Validation enforces a maximum nesting depth (`section_depth_exceeded` error if exceeded).
+
+## Planned components (not yet in schema)
+
+The following types are planned but **not valid** today — validation will reject them:
+
+| Planned `type` | Category |
+|----------------|----------|
+| `timeline` | data |
+| `entity_card` | data |
+| `progress` | feedback |
+| `stack` | layout |
+
+## Related
+
+- [Work item panel example](/extensions/examples/work-item-panel)
+- [CEL expressions](/extensions/manifests/cel)
+- [Extensions & capabilities](/extensions/manifests/extensions)

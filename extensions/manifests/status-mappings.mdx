@@ -1,0 +1,77 @@
+---
+title: "Status mappings"
+description: "Map internal work item phases to customer-facing status labels."
+---
+
+Relynt work items have a **two-layer lifecycle**:
+
+| Layer | Field | Who controls it | Purpose |
+|-------|-------|-----------------|---------|
+| **Internal** | `phase` (enum) | Backend FSM + workflows | SLA, dependencies, automation, authz |
+| **Customer** | `status` (string) | Resolved at runtime from mappings | Portals, reports, customer-facing labels |
+
+Workflow manifests may declare **customer status labels** scoped to a workflow definition or individual steps.
+
+<Warning>
+  `statusMappings` affect display labels only. They must never drive workflow branching, phase transitions, or CEL conditions — use `phase` and step logic for that.
+</Warning>
+
+## Mapping shape
+
+Each entry maps an internal **phase** to a customer-facing **label**:
+
+| Property | Type | Required | Notes |
+|----------|------|----------|-------|
+| `phase` | WorkItemPhase | Yes | Internal phase |
+| `label` | string | Yes | Customer-facing display string |
+| `priority` | integer | No | Tie-break when multiple mappings match (default 0) |
+
+```yaml
+statusMappings:
+  - phase: new
+    label: Open
+  - phase: in_progress
+    label: In Progress
+    priority: 10
+```
+
+## Work item phases
+
+| Phase | Description |
+|-------|-------------|
+| `new` | Just created |
+| `triaged` | Classified |
+| `assigned` | Assigned to owner |
+| `in_progress` | Active work |
+| `waiting` | Blocked on external input |
+| `resolved` | Work complete |
+| `closed` | Closed |
+
+## Scopes
+
+| Scope | YAML location | Notes |
+|-------|---------------|-------|
+| Workflow definition | `spec.statusMappings` | Applies when work item runs this workflow |
+| Workflow step | `spec.steps[].statusMappings` | Applies while step is active |
+
+## Validation rules
+
+- `phase` must be a valid `WorkItemPhase` enum value
+- `label` must be a non-empty string
+- No duplicate `phase` within the same `statusMappings` array (`duplicate_status_mapping_phase`)
+- Labels are plain strings — not CEL expressions
+
+## Bundle vs runtime workflows
+
+| Concern | Bundle `Workflow` manifest | Runtime workflow (builder API) |
+|---------|---------------------------|--------------------------------|
+| Authored by | Extension provider in YAML | Org admin via GraphQL builder |
+| Validated by | `manifest.ValidateBundleFiles` | Same schema |
+| Stored in | Extension version manifest blobs | `workflow_definitions` table |
+| `statusMappings` synced to Postgres | No (until copied via builder) | Yes, on publish |
+| Purpose | Template / example for adopters | Live automation for the org |
+
+## Related
+
+- [Workflows](/extensions/manifests/workflows)
+- [Lifecycle](/extensions/platform/lifecycle)

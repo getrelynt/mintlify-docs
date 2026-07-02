@@ -1,0 +1,46 @@
+---
+title: "relynt diff"
+description: "Compare two published extension versions."
+---
+
+```bash
+relynt diff [name] [from-version] [to-version]
+```
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON |
+
+## Example
+
+```bash
+relynt diff my-extension 1.0.0 1.1.0
+```
+
+## JSON output
+
+```json
+{
+  "diffs": [
+    {
+      "path": "intake-workflow.yaml",
+      "change": "modified"
+    },
+    {
+      "path": "panel-summary.yaml",
+      "change": "added"
+    }
+  ]
+}
+```
+
+## API endpoint
+
+`GET /v1/extensions/{name}/diff?from=1.0.0&to=1.1.0`
+
+## Related
+
+- [relynt versions](/cli/versions)
+- [Versioning](/extensions/platform/versioning)

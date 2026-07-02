@@ -1,54 +1,164 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Relynt Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
   },
   "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
   },
+  "api": {
+    "openapi": "openapi/extensions.json",
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": ["bash", "javascript", "python"]
+    }
+  },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "GitHub",
+        "href": "https://github.com/getrelynt"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "href": "https://app.relynt.com"
     }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Extensions",
+        "icon": "puzzle-piece",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "index",
+              "extensions/quickstart",
+              "extensions/local-development"
+            ]
+          },
+          {
+            "group": "Platform",
+            "pages": [
+              "extensions/platform/overview",
+              "extensions/platform/bundle-layout",
+              "extensions/platform/lifecycle",
+              "extensions/platform/versioning"
+            ]
+          },
+          {
+            "group": "Manifests",
+            "pages": [
+              "extensions/manifests/envelope",
+              "extensions/manifests/cel",
+              "extensions/manifests/validation"
+            ]
+          },
+          {
+            "group": "Manifest kinds",
+            "pages": [
+              "extensions/manifests/extensions",
+              "extensions/manifests/workflows",
+              "extensions/manifests/knowledge",
+              "extensions/manifests/panels",
+              "extensions/manifests/status-mappings"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "extensions/examples/email-intake",
+              "extensions/examples/http-capability",
+              "extensions/examples/work-item-panel",
+              "extensions/examples/full-bundle"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "extensions/troubleshooting/validation-errors",
+              "extensions/troubleshooting/common-fixes"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "icon": "terminal",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["cli/overview"]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "cli/auth",
+              "cli/init",
+              "cli/validate",
+              "cli/push",
+              "cli/versions",
+              "cli/diff",
+              "cli/install",
+              "cli/logs"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "icon": "square-terminal",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication",
+              "api/errors"
+            ]
+          },
+          {
+            "group": "REST — Extensions",
+            "openapi": "openapi/extensions.json",
+            "pages": [
+              "POST /extensions/bundle",
+              "POST /extensions/install",
+              "POST /extensions/uninstall",
+              "GET /extensions/{name}/versions",
+              "GET /extensions/{name}/diff",
+              "GET /extensions/{name}/logs"
+            ]
+          },
+          {
+            "group": "REST — Connections",
+            "openapi": "openapi/extensions.json",
+            "pages": [
+              "POST /extension-connections",
+              "GET /extension-connections",
+              "DELETE /extension-connections/{id}"
+            ]
+          },
+          {
+            "group": "GraphQL",
+            "pages": [
+              "api/graphql/overview",
+              "api/graphql/extensions"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "contextual": {
     "options": [
@@ -64,9 +174,7 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/getrelynt"
     }
   }
 }

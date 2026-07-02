@@ -1,0 +1,33 @@
+---
+title: "relynt logs"
+description: "Stream deployment and runtime logs for an extension."
+---
+
+```bash
+relynt logs [name]
+```
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--json` | | Emit machine-readable JSON |
+| `--follow` | | Poll for new log entries |
+| `--since` | | Only show entries after duration (e.g. `1h`) or RFC3339 timestamp |
+| `--limit` | `100` | Maximum entries per request |
+
+## Examples
+
+```bash
+relynt logs my-extension
+relynt logs my-extension --follow --since 1h
+relynt logs my-extension --json --limit 50
+```
+
+## API endpoint
+
+`GET /v1/extensions/{name}/logs?since=2026-01-15T00:00:00Z&limit=100`
+
+## Related
+
+- [Lifecycle](/extensions/platform/lifecycle)

@@ -1,0 +1,67 @@
+---
+title: "Knowledge"
+description: "Define entity types and sync mappings for structured data."
+---
+
+Knowledge manifests (`kind: Knowledge`) declare **entity types** with JSON Schema properties and CEL sync mappings from external records.
+
+## Example
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Knowledge
+metadata:
+  name: customer-records
+  version: 1.0.0
+spec:
+  entityType:
+    key: partner/customer
+    displayName: Customer
+    schema:
+      aliases:
+        - kind: external_id
+      facts:
+        - predicate: name
+      resolution:
+        auto_merge_threshold: 0.95
+        embedding_threshold: 0.85
+  sync:
+    mapping:
+      externalId: record.id
+      displayName: record.name
+      facts:
+        name: record.name
+```
+
+## Entity type key
+
+`entityType.key` must be unique across all Knowledge manifests in a bundle. Use a namespace prefix (e.g. `partner/customer`).
+
+## Schema
+
+| Field | Purpose |
+|-------|---------|
+| `aliases` | External identifier kinds for entity resolution |
+| `facts` | Predicate definitions for knowledge graph facts |
+| `resolution` | Thresholds for auto-merge and embedding similarity |
+
+## Sync mapping
+
+CEL expressions in the `knowledge.sync` context map incoming `record` fields:
+
+| Mapping field | Description |
+|---------------|-------------|
+| `externalId` | Unique external identifier |
+| `displayName` | Human-readable label |
+| `facts` | Map of predicate → CEL expression |
+
+Attribute and fact references in `sync.mapping` must match properties declared in `entityType.schema`.
+
+## On install
+
+Installing an extension registers knowledge entity types for the organization. Sync is triggered at runtime when records are ingested via `syncExtensionKnowledge`.
+
+## Related
+
+- [Validation error codes](/extensions/troubleshooting/validation-errors)
+- [CEL expressions](/extensions/manifests/cel)

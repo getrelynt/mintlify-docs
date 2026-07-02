@@ -1,0 +1,80 @@
+---
+title: "CEL expressions"
+description: "Common Expression Language contexts, variables, and helpers."
+---
+
+Relynt uses [CEL](https://github.com/google/cel-spec) (Common Expression Language) for dynamic expressions in manifests. Expressions are type-checked at validation time against versioned contexts (`cel.relynt.com/v1`).
+
+## Contexts
+
+Each manifest field uses a specific CEL context with defined root variables:
+
+| Context | Root variables | Used in |
+|---------|----------------|---------|
+| `workflow.intake` | `message`, `thread`, `now` | Workflow `spec.match` |
+| `workflow.step` | `run`, `step`, `workItem`, `message`, `now` | Step `input`, `output` |
+| `workflow.branch` | `run`, `step`, `workItem`, `message`, `now` | Branch `condition` |
+| `capability.binding` | `input`, `connection` | HTTP URL/body/headers, endpoint body |
+| `capability.response` | `input`, `response` | `responseMapping` |
+| `knowledge.sync` | `record` | `sync.mapping.*` |
+| `panel.bind` | `workItem`, `message` | Panel component bind fields |
+
+## Helper functions
+
+Available in all contexts:
+
+| Helper | Description |
+|--------|-------------|
+| `email_domain(addr)` | Extract domain from email address |
+| `normalize_domain(domain)` | Normalize domain string |
+| `coalesce(a, b, ...)` | Return first non-empty value |
+| `to_json(value)` | Serialize value to JSON string |
+| `parse_json(string)` | Parse JSON string to map |
+| `jmes(data, query)` | JMESPath query on data |
+| `is_reply(message)` | Whether message is a reply |
+| `participant_domains(message)` | List of participant email domains |
+| `thread_participant_count(thread)` | Number of thread participants |
+
+## Examples
+
+**Workflow intake match:**
+
+```yaml
+match: 'message.subject.contains("invoice") || "acme.com" in participant_domains(message)'
+```
+
+**Branch condition:**
+
+```yaml
+condition: step.outputs.classify.confidence >= 0.8
+```
+
+**HTTP binding body:**
+
+```yaml
+body: to_json(input)
+```
+
+**Panel bind:**
+
+```yaml
+content: workItem.phase == 'waiting' ? 'Awaiting customer reply' : ''
+```
+
+## HTTP URL interpolation
+
+HTTP bindings support `${...}` interpolation in URLs, validated as CEL in the `capability.binding` context:
+
+```yaml
+url: https://api.example.com/messages/${input.messageId}
+```
+
+## What is not CEL
+
+`statusMappings` labels are plain strings — not CEL expressions. Use `phase` and step logic for branching, never customer status labels.
+
+## Related
+
+- [Workflows](/extensions/manifests/workflows)
+- [Panels](/extensions/manifests/panels)
+- [Validation](/extensions/manifests/validation)

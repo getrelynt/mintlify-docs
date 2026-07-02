@@ -1,0 +1,177 @@
+---
+title: "GraphQL extensions"
+description: "Extension registry queries and mutations."
+---
+
+Extension-related GraphQL operations from `extension.graphql`.
+
+## Queries
+
+### extensionInstalls
+
+List extension installs for the authenticated organization.
+
+```graphql
+query {
+  extensionInstalls {
+    id
+    extensionName
+    semver
+    status
+    installedAt
+  }
+}
+```
+
+### extensionVersions
+
+List published versions of an extension.
+
+```graphql
+query {
+  extensionVersions(extensionName: "my-extension") {
+    id
+    semver
+    contentHash
+    publishedAt
+  }
+}
+```
+
+### extensionConnections
+
+List extension connections for the organization.
+
+```graphql
+query {
+  extensionConnections {
+    id
+    extensionName
+    connectionKey
+    authKind
+    status
+    endpointUrl
+    connectedAt
+  }
+}
+```
+
+## Mutations
+
+### pushExtensionBundle
+
+Push a manifest bundle (equivalent to `POST /v1/extensions/bundle`).
+
+```graphql
+mutation {
+  pushExtensionBundle(input: {
+    files: [
+      { name: "extension.yaml", content: "apiVersion: relynt.com/v1\n..." }
+    ]
+  }) {
+    id
+    semver
+    contentHash
+  }
+}
+```
+
+### installExtension
+
+Install a published version for the organization.
+
+```graphql
+mutation {
+  installExtension(input: {
+    extensionName: "my-extension"
+    semver: "1.0.0"
+  }) {
+    id
+    status
+  }
+}
+```
+
+### uninstallExtension
+
+Remove an extension install.
+
+```graphql
+mutation {
+  uninstallExtension(installId: "550e8400-e29b-41d4-a716-446655440000")
+}
+```
+
+### createExtensionConnection
+
+Register a webhook-signed endpoint for capability bindings.
+
+```graphql
+mutation {
+  createExtensionConnection(input: {
+    extensionName: "classify-email"
+    connectionKey: "classify-email-dev"
+    endpointUrl: "https://hooks.example.com/classify"
+    signingKey: "your-signing-key"
+  }) {
+    id
+    extensionName
+    connectionKey
+    status
+  }
+}
+```
+
+### disconnectExtensionConnection
+
+Remove an extension connection.
+
+```graphql
+mutation {
+  disconnectExtensionConnection(connectionId: "550e8400-e29b-41d4-a716-446655440000")
+}
+```
+
+### syncExtensionKnowledge
+
+Sync a knowledge record for an installed extension.
+
+```graphql
+mutation {
+  syncExtensionKnowledge(input: {
+    installId: "550e8400-e29b-41d4-a716-446655440000"
+    typeKey: "partner/customer"
+    record: { id: "ext-123", name: "Acme Corp" }
+  })
+}
+```
+
+## Types
+
+### ExtensionConnection
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | ID | Connection UUID |
+| `extensionName` | String | Extension name |
+| `connectionKey` | String | Binding reference key |
+| `authKind` | Enum | `webhook_signature`, `api_key`, `none` |
+| `status` | Enum | `pending`, `active`, `error`, `disconnected` |
+| `endpointUrl` | String | Webhook URL |
+| `connectedAt` | Time | Creation timestamp |
+
+### Input types
+
+| Input | Fields |
+|-------|--------|
+| `PushExtensionBundleInput` | `files: [ExtensionBundleFileInput!]!` |
+| `ExtensionBundleFileInput` | `name: String!`, `content: String!` |
+| `InstallExtensionInput` | `extensionName: String!`, `semver: String!` |
+| `CreateExtensionConnectionInput` | `extensionName`, `connectionKey`, `endpointUrl`, `signingKey` |
+| `SyncExtensionKnowledgeInput` | `installId`, `typeKey`, `record` |
+
+## Related
+
+- [REST API overview](/api/overview)
+- [Extensions & capabilities](/extensions/manifests/extensions)
+- [Authentication](/api/authentication)

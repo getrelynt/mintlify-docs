@@ -1,0 +1,82 @@
+---
+title: "Work item panel"
+description: "Panel with metrics, alerts, and capability actions."
+---
+
+This example shows a full work item detail panel with nested sections, conditional alerts, and capability actions.
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Panel
+metadata:
+  name: work-item-summary
+  version: 1.0.0
+spec:
+  surface: work_item_detail
+  match: workItem.phase != 'closed'
+  components:
+    - type: section
+      bind:
+        title: "'Overview'"
+        components:
+          - type: badge
+            bind:
+              label: workItem.status
+              tone: info
+          - type: metric
+            bind:
+              label: Priority
+              value: workItem.priority
+          - type: field_list
+            bind:
+              fields:
+                - label: From
+                  value: message.from
+                - label: Subject
+                  value: message.subject
+    - type: separator
+      bind: {}
+    - type: alert
+      bind:
+        content: "workItem.phase == 'waiting' ? 'Awaiting customer reply' : ''"
+        tone: warning
+    - type: actions
+      bind:
+        actions:
+          - label: Classify
+            capability: classify-email
+            input:
+              messageId: message.id
+              subject: message.subject
+              bodyText: message.bodyText
+```
+
+## Requirements
+
+- `classify-email` capability must exist in a companion Extension manifest in the same bundle
+- `spec.match` filters the panel to non-closed work items
+- Alert `content` uses a ternary CEL expression to show context-aware messages
+
+## Minimal sidebar panel
+
+For a compact sidebar variant:
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Panel
+metadata:
+  name: work-item-summary
+  version: 1.0.0
+spec:
+  surface: work_item_sidebar
+  components:
+    - type: text
+      bind:
+        content: message.subject
+        variant: heading
+```
+
+## Related
+
+- [Panels](/extensions/manifests/panels)
+- [Full bundle example](/extensions/examples/full-bundle)

@@ -1,0 +1,58 @@
+---
+title: "Lifecycle"
+description: "From local validation to org-scoped installation."
+---
+
+## Stages
+
+| Stage | Tool | What happens |
+|-------|------|--------------|
+| **Author** | Editor | Write YAML manifests in a bundle directory |
+| **Validate** | `relynt validate` | Structural + CEL + cross-file reference checks |
+| **Publish** | `relynt push` | Re-validate on server, compute content hash, store immutable version |
+| **Install** | `relynt install` | Pin version for org; register capabilities, knowledge types, panels |
+| **Connect** | API / GraphQL | Org creates extension connections for endpoint bindings |
+| **Run** | Relynt runtime | Capabilities execute; panels resolve; knowledge syncs |
+
+## Validation parity
+
+The CLI and server share the `github.com/getrelynt/manifest` validation library. A bundle that passes `relynt validate` will pass server validation unless you are on mismatched schema versions.
+
+`relynt push` validates locally before sending the HTTP request. The server re-validates on receipt.
+
+## What install wires up
+
+| Manifest kind | On install |
+|---------------|------------|
+| Extension (capabilities) | Registered in org capability catalog |
+| Knowledge | Entity types available for sync |
+| Panel | Resolved at runtime via `resolvePanels` |
+| Workflow | Stored in registry only — **not imported** |
+
+<Warning>
+  Bundle workflows are templates. To run automation, an org admin must create or publish a workflow through the workflow builder API. See [Status mappings](/extensions/manifests/status-mappings) for the distinction between bundle and runtime workflows.
+</Warning>
+
+## Uninstall
+
+Remove an org install with the CLI or API:
+
+```bash
+relynt uninstall <install-id>
+```
+
+Uninstalling removes the org pin but does not delete published versions from the registry.
+
+## Logs and monitoring
+
+Stream deployment and runtime logs:
+
+```bash
+relynt logs my-extension --follow --since 1h
+```
+
+## Related
+
+- [Quickstart](/extensions/quickstart)
+- [Versioning](/extensions/platform/versioning)
+- [CLI push](/cli/push)

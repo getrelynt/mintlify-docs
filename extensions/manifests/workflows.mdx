@@ -1,0 +1,89 @@
+---
+title: "Workflows"
+description: "Define automation step graphs for email and work item triggers."
+---
+
+Workflow manifests (`kind: Workflow`) define step graphs triggered by platform events.
+
+## Triggers
+
+| Event | Description |
+|-------|-------------|
+| `email.received` | New inbound email |
+| `work_item.created` | New work item |
+| `workflow.start` | Manual or API-initiated start |
+
+## Example workflow
+
+```yaml
+apiVersion: relynt.com/v1
+kind: Workflow
+metadata:
+  name: invoice-intake
+  version: 1.0.0
+spec:
+  trigger:
+    event: email.received
+  match: 'message.subject.contains("invoice") || "acme.com" in participant_domains(message)'
+  priority: 10
+  statusMappings:
+    - phase: new
+      label: Open
+  start: classify
+  steps:
+    - id: classify
+      type: Capability
+      capability: classify-email
+      input:
+        messageId: message.id
+        subject: message.subject
+        bodyText: message.bodyText
+      next: triage
+    - id: triage
+      type: Branch
+      condition: step.outputs.classify.confidence >= 0.8
+      next: auto_route
+      onFalse: manual_review
+    - id: auto_route
+      type: Terminate
+    - id: manual_review
+      type: Human
+      assignee: ops-team
+      statusMappings:
+        - phase: waiting
+          label: Awaiting Review
+      next: auto_route
+```
+
+## Step types
+
+| Type | Purpose |
+|------|---------|
+| `Capability` | Invoke a capability from the bundle |
+| `Branch` | Conditional routing (`condition` CEL, `next` / `onFalse`) |
+| `Human` | Assign to a team or user for manual action |
+| `Wait` | Pause until a condition or timeout |
+| `Terminate` | End the workflow run |
+| `AI` | AI-assisted step |
+
+## Step references
+
+- `start` must reference a valid step `id`
+- Each step's `next` (and `onFalse` for branches) must reference existing step IDs
+- `Capability` steps must reference a capability declared in a companion Extension manifest
+
+## Intake match
+
+`spec.match` is a CEL bool in the `workflow.intake` context. When multiple workflows match, `priority` (higher wins) breaks ties.
+
+## Bundle vs runtime workflows
+
+<Warning>
+  Bundle workflows are validated and stored in the registry but are **not imported on install**. Orgs adopt templates through the workflow builder API. See [Status mappings](/extensions/manifests/status-mappings).
+</Warning>
+
+## Related
+
+- [Email intake example](/extensions/examples/email-intake)
+- [Status mappings](/extensions/manifests/status-mappings)
+- [CEL expressions](/extensions/manifests/cel)

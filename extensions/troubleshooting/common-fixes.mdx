@@ -1,0 +1,78 @@
+---
+title: "Common fixes"
+description: "Solutions for frequent validation and push errors."
+---
+
+## Capability not found (`missing_capability_ref`)
+
+**Symptom:** Workflow or panel references a capability that validation cannot find.
+
+**Fix:**
+- Ensure the capability is declared in an Extension manifest in the **same bundle**
+- Check the capability name matches exactly (kebab-case, case-sensitive)
+- For multi-capability extensions, use the `name` field in `spec.capabilities[]`
+
+## Step reference invalid (`missing_step_ref`)
+
+**Symptom:** `start`, `next`, or `onFalse` points to a non-existent step ID.
+
+**Fix:**
+- Verify all referenced step IDs exist in `spec.steps[]`
+- Check for typos in step `id` values
+- Ensure `start` references a valid step
+
+## CEL type error (`cel_type_error`)
+
+**Symptom:** Expression fails type-checking.
+
+**Fix:**
+- Check you're using the correct context (e.g. `message` in `workflow.intake`, not `workItem`)
+- Verify field names match domain types (`message.subject`, not `message.subjec`)
+- Use helpers for complex operations (`participant_domains(message)`, `to_json(input)`)
+
+## Semver conflict on push (`409 Conflict`)
+
+**Symptom:** Push fails because semver already exists with different content.
+
+**Fix:**
+- Bump `metadata.version` in your Extension manifest
+- Do not attempt to overwrite published versions
+
+## Duplicate status mapping (`duplicate_status_mapping_phase`)
+
+**Symptom:** Two entries in the same `statusMappings` array use the same `phase`.
+
+**Fix:**
+- Remove or merge duplicate phase entries
+- Use `priority` to break ties across scopes, not duplicate phases within one array
+
+## Knowledge attribute unknown (`unknown_attribute_ref`)
+
+**Symptom:** Sync mapping references a field not declared in `entityType.schema`.
+
+**Fix:**
+- Add the attribute or fact predicate to the schema first
+- Then reference it in `sync.mapping`
+
+## Panel section too deep (`section_depth_exceeded`)
+
+**Symptom:** Nested `section` components exceed the maximum depth.
+
+**Fix:**
+- Flatten the component hierarchy
+- Use sibling components instead of deeply nested sections
+
+## Auth failures on push
+
+**Symptom:** `401 Unauthorized` or `403 Forbidden` on `relynt push`.
+
+**Fix:**
+- Run `relynt auth login --org <org-id>`
+- Verify `relynt auth whoami` shows the correct org
+- Confirm your account has extension publish permissions
+
+## Related
+
+- [Validation error codes](/extensions/troubleshooting/validation-errors)
+- [Authentication](/api/authentication)
+- [Local development](/extensions/local-development)

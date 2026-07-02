@@ -1,0 +1,59 @@
+---
+title: "relynt validate"
+description: "Validate an extension bundle locally."
+---
+
+Run the same validation as the server without publishing.
+
+```bash
+relynt validate [path]
+```
+
+Default path is `./manifests`.
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON output |
+
+## Examples
+
+```bash
+relynt validate ./manifests
+relynt validate ./manifests --json
+```
+
+## JSON output
+
+```json
+{
+  "errors": [
+    {
+      "path": "spec.steps[0].capability",
+      "code": "missing_capability_ref",
+      "message": "capability \"foo\" not found in bundle"
+    }
+  ]
+}
+```
+
+An empty `errors` array means validation passed.
+
+## What is validated
+
+- JSON Schema structural validation per manifest kind
+- CEL type-checking for all expressions
+- Cross-file reference integrity (capabilities, steps, knowledge attributes)
+- Bundle-level checks (duplicate entity type keys)
+
+## CI usage
+
+```bash
+relynt validate ./manifests --json | jq -e '.errors | length == 0'
+```
+
+## Related
+
+- [Validation](/extensions/manifests/validation)
+- [Validation error codes](/extensions/troubleshooting/validation-errors)

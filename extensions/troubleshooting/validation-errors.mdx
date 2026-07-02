@@ -1,0 +1,71 @@
+---
+title: "Validation error codes"
+description: "Structured error codes returned by validate and push."
+---
+
+Validation errors use a consistent shape across CLI and API:
+
+```json
+{
+  "path": "spec.steps[0].capability",
+  "code": "missing_capability_ref",
+  "message": "capability \"foo\" not found in bundle"
+}
+```
+
+## Error codes
+
+| Code | Description |
+|------|-------------|
+| `parse_error` | YAML/JSON parse failure |
+| `schema_error` | JSON Schema structural validation failure |
+| `cel_type_error` | CEL expression failed type-checking |
+| `duplicate_step_id` | Two workflow steps share the same `id` |
+| `missing_step_ref` | `start`, `next`, or `onFalse` references a non-existent step |
+| `missing_capability_ref` | Capability name not found in bundle Extensions |
+| `duplicate_status_mapping_phase` | Duplicate `phase` in a `statusMappings` array |
+| `duplicate_alias_kind` | Duplicate alias kind in knowledge schema |
+| `unknown_attribute_ref` | Sync mapping references undeclared schema attribute |
+| `unknown_fact_ref` | Sync mapping references undeclared fact predicate |
+| `duplicate_entity_type_key` | Two Knowledge manifests share the same `entityType.key` |
+| `invalid_allowed_host` | HTTP binding `allowedHosts` entry is invalid |
+| `section_depth_exceeded` | Panel section nesting exceeds maximum depth |
+
+JSON Schema structural errors may also appear with paths like `spec.input.required[0]` and codes derived from the schema validator.
+
+## CLI output
+
+Human-readable (default):
+
+```bash
+relynt validate ./manifests
+# spec.steps[0].capability: capability "foo" not found in bundle
+```
+
+Machine-readable:
+
+```bash
+relynt validate ./manifests --json
+```
+
+## API output
+
+`POST /v1/extensions/bundle` returns HTTP `422` with:
+
+```json
+{
+  "errors": [
+    {
+      "path": "spec.steps[0].capability",
+      "code": "missing_capability_ref",
+      "message": "capability \"foo\" not found in bundle"
+    }
+  ]
+}
+```
+
+## Related
+
+- [Common fixes](/extensions/troubleshooting/common-fixes)
+- [Validation](/extensions/manifests/validation)
+- [API errors](/api/errors)
