@@ -105,6 +105,29 @@ responseMapping:
 
 Set `exposeAsTool: true` to make the capability available as an AI agent tool at runtime.
 
+## Execution controls
+
+Each capability accepts optional execution settings alongside `input`, `output`, and `binding`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `idempotencyKey` | CEL string | Expression evaluated in the `capability.binding` context; identical keys deduplicate repeated executions |
+| `timeout` | duration string | Outbound call timeout (for example `30s` or `PT30S`) |
+| `retries.maxAttempts` | integer | Maximum attempts (default `3`) |
+| `retries.backoff` | duration string | Initial retry backoff (for example `1s`, `500ms`) |
+
+```yaml
+spec:
+  # ... input / output / binding ...
+  idempotencyKey: input.messageId
+  timeout: 30s
+  retries:
+    maxAttempts: 3
+    backoff: 1s
+```
+
+`pagination` is reserved for future use — validation accepts it but the executor ignores it today.
+
 ## Related
 
 - [HTTP capability example](/extensions/examples/http-capability)

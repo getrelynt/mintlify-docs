@@ -22,11 +22,13 @@ relynt init --name my-extension
 ```
 manifests/
   extension.yaml
-  capabilities/
+  README.md
   workflows/
+  panels/
+  knowledge/
 ```
 
-The starter `extension.yaml` includes a minimal `kind: Extension` manifest with your chosen name and version.
+The starter `extension.yaml` includes a minimal `kind: Extension` manifest with your chosen name and version. Capabilities are declared inside Extension manifests, so there is no separate `capabilities/` directory.
 
 ## Example
 

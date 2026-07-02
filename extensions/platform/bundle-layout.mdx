@@ -11,9 +11,11 @@ An extension is published as a **bundle** — a directory of manifest files (`.y
 
 ```
 manifests/
-  extension.yaml          # kind: Extension (bundle identity)
-  capabilities/           # optional subdirectory
-  workflows/              # optional subdirectory
+  extension.yaml          # kind: Extension (bundle identity + capabilities)
+  README.md               # bundle overview
+  workflows/              # optional: kind: Workflow manifests
+  panels/                 # optional: kind: Panel manifests
+  knowledge/              # optional: kind: Knowledge manifests
 ```
 
 ## Typical production bundle

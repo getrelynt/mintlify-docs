@@ -26,9 +26,21 @@ relynt validate ./manifests --json
 
 ## JSON output
 
+On success:
+
 ```json
 {
-  "errors": [
+  "valid": true
+}
+```
+
+On failure, bundle-level errors appear in `errors` and per-manifest errors in `manifest_errors`:
+
+```json
+{
+  "valid": false,
+  "errors": [],
+  "manifest_errors": [
     {
       "path": "spec.steps[0].capability",
       "code": "missing_capability_ref",
@@ -38,7 +50,15 @@ relynt validate ./manifests --json
 }
 ```
 
-An empty `errors` array means validation passed.
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Bundle is valid |
+| `1` | Generic error (unreadable bundle, bad path) |
+| `2` | Validation failed |
+
+`validate` works offline — it needs no authentication or API configuration.
 
 ## What is validated
 
@@ -50,7 +70,7 @@ An empty `errors` array means validation passed.
 ## CI usage
 
 ```bash
-relynt validate ./manifests --json | jq -e '.errors | length == 0'
+relynt validate ./manifests --json | jq -e '.valid'
 ```
 
 ## Related

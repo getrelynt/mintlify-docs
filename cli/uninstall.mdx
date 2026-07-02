@@ -1,0 +1,43 @@
+---
+title: "relynt uninstall"
+description: "Uninstall an extension from your organization."
+---
+
+Remove a pinned extension install by install ID. The install ID is returned by [`relynt install`](/cli/install).
+
+```bash
+relynt uninstall <install-id>
+```
+
+## Example
+
+```bash
+relynt uninstall 550e8400-e29b-41d4-a716-446655440000
+```
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Emit machine-readable JSON |
+
+## What happens on uninstall
+
+- The install status becomes `disabled` — capabilities stop resolving for the organization
+- Extension-contributed knowledge entity types are disabled
+- Published versions remain in the registry; reinstall at any time with `relynt install`
+
+## API endpoint
+
+`POST /v1/extensions/uninstall`
+
+```json
+{
+  "install_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+## Related
+
+- [Install an extension](/cli/install)
+- [Lifecycle](/extensions/platform/lifecycle)

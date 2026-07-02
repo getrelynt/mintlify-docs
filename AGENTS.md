@@ -32,6 +32,10 @@ Use "organization" not "org" in prose (except CLI flag names like `--org`).
 - Internal ops runbooks (deploy, Datadog, EU plan)
 - Full platform GraphQL (billing, ingest, enterprise) unless scope expands
 - Notion RFC internals — summarize concepts, link to public docs only
+- Relynt admin GraphQL mutations and review workflows
+- Internal env vars (`PARTNER_ADMIN_ORG_IDS`, `RELYNT_ORG_ID`, etc.)
+- Billing or Metronome entitlement identifiers
+- Database or table implementation details
 
 ## Source material
 

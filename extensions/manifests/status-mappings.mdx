@@ -7,7 +7,7 @@ Relynt work items have a **two-layer lifecycle**:
 
 | Layer | Field | Who controls it | Purpose |
 |-------|-------|-----------------|---------|
-| **Internal** | `phase` (enum) | Backend FSM + workflows | SLA, dependencies, automation, authz |
+| **Internal** | `phase` (enum) | Platform workflows | SLA, dependencies, automation |
 | **Customer** | `status` (string) | Resolved at runtime from mappings | Portals, reports, customer-facing labels |
 
 Workflow manifests may declare **customer status labels** scoped to a workflow definition or individual steps.
@@ -65,11 +65,11 @@ statusMappings:
 
 | Concern | Bundle `Workflow` manifest | Runtime workflow (builder API) |
 |---------|---------------------------|--------------------------------|
-| Authored by | Extension provider in YAML | Org admin via GraphQL builder |
-| Validated by | `manifest.ValidateBundleFiles` | Same schema |
-| Stored in | Extension version manifest blobs | `workflow_definitions` table |
-| `statusMappings` synced to Postgres | No (until copied via builder) | Yes, on publish |
-| Purpose | Template / example for adopters | Live automation for the org |
+| Authored by | Extension provider in YAML | Installing organization via workflow builder |
+| Validated by | Same manifest validation as other bundle files | Same schema |
+| Stored in | Extension version manifest blobs | Organization's live workflow configuration |
+| `statusMappings` applied at runtime | No (until adopted via builder) | Yes, when the org publishes a runtime workflow |
+| Purpose | Template / example for adopters | Live automation for the organization |
 
 ## Related
 

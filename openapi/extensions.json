@@ -91,7 +91,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "pending", "error"]
+            "enum": ["active", "disabled"]
           }
         }
       },

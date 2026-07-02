@@ -57,14 +57,14 @@ spec:
 
 ## Step types
 
-| Type | Purpose |
-|------|---------|
-| `Capability` | Invoke a capability from the bundle |
-| `Branch` | Conditional routing (`condition` CEL, `next` / `onFalse`) |
-| `Human` | Assign to a team or user for manual action |
-| `Wait` | Pause until a condition or timeout |
-| `Terminate` | End the workflow run |
-| `AI` | AI-assisted step |
+| Type | Purpose | Required fields |
+|------|---------|-----------------|
+| `Capability` | Invoke a capability from the bundle | `capability`, `input` |
+| `Branch` | Conditional routing | `condition` (CEL bool); route with `next` / `onFalse` |
+| `Human` | Assign to a team or user for manual action | `assignee` |
+| `Wait` | Pause for a fixed duration | `duration` (for example `24h`) |
+| `Terminate` | End the workflow run | — |
+| `AI` | AI-assisted step | `task` (for example `classify`, `draft`) |
 
 ## Step references
 
@@ -79,7 +79,7 @@ spec:
 ## Bundle vs runtime workflows
 
 <Warning>
-  Bundle workflows are validated and stored in the registry but are **not imported on install**. Orgs adopt templates through the workflow builder API. See [Status mappings](/extensions/manifests/status-mappings).
+  Bundle workflows are validated and stored in the registry but are **not imported on install**. The installing organization must adopt templates through the workflow builder before automation runs. See [Status mappings](/extensions/manifests/status-mappings).
 </Warning>
 
 ## Related

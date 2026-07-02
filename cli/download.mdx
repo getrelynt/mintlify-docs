@@ -1,0 +1,99 @@
+---
+title: "Install the CLI"
+description: "Install the relynt CLI on macOS, Linux, and Windows."
+---
+
+Binaries are distributed from [https://artifacts.getrelynt.com](https://artifacts.getrelynt.com). They are signed (macOS notarized, Windows Authenticode) and are not downloaded from GitHub.
+
+## macOS and Linux
+
+```bash
+curl -fsSL https://artifacts.getrelynt.com/cli/install.sh | bash
+```
+
+Install to a custom directory:
+
+```bash
+curl -fsSL https://artifacts.getrelynt.com/cli/install.sh | bash -s -- --dir ~/.local/bin
+```
+
+## Windows
+
+```powershell
+irm https://artifacts.getrelynt.com/cli/install.ps1 | iex
+```
+
+## Homebrew
+
+Available after the first stable release:
+
+```bash
+brew tap getrelynt/tap
+brew install --cask relynt
+```
+
+Upgrade:
+
+```bash
+brew upgrade --cask relynt
+```
+
+## Scoop
+
+Available after the first stable release:
+
+```powershell
+scoop bucket add relynt https://github.com/getrelynt/scoop-bucket.git
+scoop install relynt
+```
+
+Upgrade:
+
+```powershell
+scoop update relynt
+```
+
+## Linux packages
+
+Stable `.deb` and `.rpm` packages are listed in the release manifest:
+
+```text
+https://artifacts.getrelynt.com/cli/stable/latest.json
+```
+
+Install with your package manager after downloading the appropriate artifact for your platform.
+
+## Upgrade
+
+Direct installs (script or manual binary):
+
+```bash
+relynt update
+```
+
+Package-manager installs should be upgraded through Homebrew, Scoop, or your Linux package manager.
+
+## Pre-releases
+
+To install or track release candidates:
+
+```bash
+curl -fsSL https://artifacts.getrelynt.com/cli/install.sh | bash -s -- --channel rc
+```
+
+```bash
+relynt update --channel rc
+```
+
+Pre-release manifests are published to `https://artifacts.getrelynt.com/cli/rc/latest.json`.
+
+## Verify
+
+```bash
+relynt --version
+```
+
+## Related
+
+- [CLI overview](/cli/overview)
+- [Authentication](/cli/auth)

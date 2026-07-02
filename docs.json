@@ -1,16 +1,24 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "maple",
   "name": "Relynt Docs",
   "colors": {
-    "primary": "#2563EB",
-    "light": "#3B82F6",
-    "dark": "#1D4ED8"
+    "primary": "#FE6755",
+    "light": "#FE6755",
+    "dark": "#FE6755"
   },
   "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter"
+    },
+    "body": {
+      "family": "Inter"
+    }
   },
   "api": {
     "openapi": "openapi/extensions.json",
@@ -25,7 +33,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://app.relynt.com"
+      "href": "https://app.getrelynt.com"
     }
   },
   "navigation": {
@@ -93,7 +101,7 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": ["cli/overview"]
+            "pages": ["cli/overview", "cli/download"]
           },
           {
             "group": "Commands",
@@ -105,6 +113,7 @@
               "cli/versions",
               "cli/diff",
               "cli/install",
+              "cli/uninstall",
               "cli/logs"
             ]
           }

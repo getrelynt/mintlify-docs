@@ -15,7 +15,7 @@ Default path is `./manifests`.
 
 | Flag | Description |
 |------|-------------|
-| `--json` | Emit machine-readable JSON on validation failure |
+| `--json` | Emit machine-readable JSON |
 
 ## Example
 
@@ -27,8 +27,26 @@ relynt push ./manifests
 ## Success output
 
 ```
-Published my-extension@1.0.0 (content_hash: a1b2c3...)
+Published 1.0.0 (hash a1b2c3...)
 ```
+
+With `--json`:
+
+```json
+{
+  "semver": "1.0.0",
+  "content_hash": "a1b2c3..."
+}
+```
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Published |
+| `1` | Generic error |
+| `2` | Validation failed (local or server) |
+| `3` | Not authenticated |
 
 ## API endpoint
 

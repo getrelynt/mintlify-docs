@@ -14,6 +14,70 @@ description: "From local validation to org-scoped installation."
 | **Connect** | API / GraphQL | Org creates extension connections for endpoint bindings |
 | **Run** | Relynt runtime | Capabilities execute; panels resolve; knowledge syncs |
 
+## Who can publish
+
+Extension publishing is gated by organization type:
+
+| Organization | Requirement | Extension scope |
+|--------------|-------------|-----------------|
+| **Partner** | Active partner profile (promoted by Relynt) | `marketplace` — eligible for public marketplace listings |
+| **Enterprise customer** | Extension publish permission on the organization | `private` — org-scoped; install within the same organization only |
+| **Other** | Not permitted | — |
+
+Partners create marketplace listings via GraphQL (`upsertMarketplaceListing`, submit for review, then `publishMarketplaceListing` after approval). Published listings can be installed into other organizations with `installMarketplaceExtension`.
+
+## Marketplace listing review
+
+Partner listings go through an approval workflow before they can be published:
+
+| State | Meaning |
+|-------|---------|
+| `draft` | Partner is editing listing metadata |
+| `submitted` | Partner submitted for Relynt review |
+| `in_review` | Under Relynt review |
+| `approved` | Listing may be published |
+| `rejected` | Partner must address feedback and resubmit |
+
+Listings can be published only after approval. Use `publishMarketplaceListing` once the listing reaches the `approved` state.
+
+## Bundle signing and attestation
+
+Partner organizations must sign every bundle push with a registered Ed25519 key:
+
+1. Register a key via GraphQL (`registerPartnerSigningKey`).
+2. Include `signature: { keyId, signature }` when pushing — the signature is over the bundle **content hash** bytes.
+3. On listing approval, Relynt adds a `relynt_signature` attestation to the featured bundle version.
+
+Marketplace installs require a Relynt attestation on the installed version. Private (same-org) installs are unchanged.
+
+## Marketplace install
+
+Organizations can install published marketplace extensions without a local `ExtensionDefinition`:
+
+```graphql
+mutation {
+  installMarketplaceExtension(input: {
+    listingId: "..."
+    semver: "1.0.0"
+  }) {
+    id
+    semver
+    listing { headline }
+  }
+}
+```
+
+Installed capabilities and panels resolve from the **publisher's** bundle manifests. Use `marketplaceInstalls` to list marketplace pins and `uninstallMarketplaceExtension` to remove them.
+
+## Trust badges
+
+| Badge | Meaning |
+|-------|---------|
+| **Relynt Verified** | Relynt has vetted the partner organization |
+| **Relynt Built** | Extension published by Relynt |
+
+Badges appear on public partner profiles and marketplace listing cards.
+
 ## Validation parity
 
 The CLI and server use the same validation engine. A bundle that passes `relynt validate` will pass server validation unless you are on mismatched schema versions.
@@ -30,7 +94,7 @@ The CLI and server use the same validation engine. A bundle that passes `relynt 
 | Workflow | Stored in registry only — **not imported** |
 
 <Warning>
-  Bundle workflows are templates. To run automation, an org admin must create or publish a workflow through the workflow builder API. See [Status mappings](/extensions/manifests/status-mappings) for the distinction between bundle and runtime workflows.
+  Bundle workflows are templates. The installing organization must adopt the template through the workflow builder before automation runs. See [Status mappings](/extensions/manifests/status-mappings) for the distinction between bundle and runtime workflows.
 </Warning>
 
 ## Uninstall
