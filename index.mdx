@@ -3,7 +3,7 @@ title: "Introduction"
 description: "Build and deploy declarative extensions for the Relynt platform."
 ---
 
-Relynt extensions are **declarative YAML bundles** that define capabilities, workflows, knowledge entities, and UI panels. You author manifests locally, validate them with the CLI, and publish immutable versions to the extension registry.
+A Relynt **extension** is a complete integration — a declarative package that connects your systems to the platform. Each extension is a bundle of YAML manifests that define capabilities, workflows, knowledge entities, and UI panels. You author manifests locally, validate them with the CLI, and publish immutable versions to the extension registry.
 
 <Columns cols={3}>
   <Card title="Quickstart" icon="rocket" href="/extensions/quickstart">
@@ -17,14 +17,14 @@ Relynt extensions are **declarative YAML bundles** that define capabilities, wor
   </Card>
 </Columns>
 
-## What you can build
+## What an extension contains
 
-| Manifest kind | Purpose |
-|---------------|---------|
-| **Extension** | Capabilities with input/output schemas and HTTP or endpoint bindings |
-| **Workflow** | Step graphs for email intake and work item automation |
+| Component | Purpose |
+|-----------|---------|
+| **Capabilities** | Typed operations with input/output schemas and HTTP or endpoint bindings |
+| **Workflows** | Step graphs for email intake and work item automation |
 | **Knowledge** | Entity types and sync mappings for structured data |
-| **Panel** | Declarative UI surfaces rendered at runtime from CEL bind values |
+| **Panels** | Declarative UI surfaces rendered at runtime from CEL bind values |
 
 ## How it works
 

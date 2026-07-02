@@ -3,12 +3,12 @@ title: "Quickstart"
 description: "Scaffold, validate, and publish your first Relynt extension."
 ---
 
-Get a working extension bundle from zero to published in five steps.
+Get a working extension from zero to published in five steps.
 
 ## Prerequisites
 
 - [Relynt CLI](/cli/overview) installed
-- Authenticated with `relynt auth login` (see [Local development](/extensions/local-development) for dev setup)
+- Authenticated with `relynt auth login` (see [Local development](/extensions/local-development))
 
 <Steps>
   <Step title="Scaffold a bundle">
@@ -21,7 +21,7 @@ Get a working extension bundle from zero to published in five steps.
     This creates a `manifests/` directory with a starter `extension.yaml` and empty `capabilities/` and `workflows/` folders.
   </Step>
   <Step title="Edit manifests">
-    Add capability definitions, workflows, or panels to your bundle. At minimum, your bundle must include one `kind: Extension` manifest that sets the bundle identity (`metadata.name` and `metadata.version`).
+    Add capabilities, workflows, knowledge, and panels to your extension. At minimum, your bundle must include one `kind: Extension` manifest that sets the extension identity (`metadata.name` and `metadata.version`).
   </Step>
   <Step title="Validate locally">
     Run validation before pushing. The CLI uses the same validation engine as the server:

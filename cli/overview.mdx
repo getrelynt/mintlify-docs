@@ -7,21 +7,15 @@ The `relynt` CLI validates extension bundles locally and deploys immutable versi
 
 ## Install
 
-Download from [GitHub Releases](https://github.com/getrelynt/relynt-cli/releases) or build from source:
-
-```bash
-git clone https://github.com/getrelynt/relynt-cli.git
-cd relynt-cli
-task build
-./bin/relynt --version
-```
+<Note>
+  Binary downloads and package manager installs (Homebrew, apt, and more) are coming soon.
+</Note>
 
 ## Global flags
 
 | Flag | Description |
 |------|-------------|
 | `-v`, `--verbose` | Verbose output |
-| `--api-url` | Override API base URL (dev builds only) |
 | `--version` | Print build version |
 
 ## Commands
@@ -48,16 +42,8 @@ relynt push ./manifests
 relynt install my-extension@0.1.0
 ```
 
-## Dev vs release builds
-
-| Build | Config | Env overrides |
-|-------|--------|---------------|
-| Release binary | Embedded at build time | Not supported |
-| Dev build (`task build`) | From env / Doppler | `--api-url` supported |
-
-See [Local development](/extensions/local-development) for Doppler setup.
-
 ## Related
 
 - [Quickstart](/extensions/quickstart)
+- [Local development](/extensions/local-development)
 - [API reference](/api/overview)

@@ -3,7 +3,7 @@ title: "How extensions work"
 description: "Core concepts of the Relynt extensions platform."
 ---
 
-Relynt extensions let you extend the platform with **declarative manifests** — no server-side code in your bundle. You define capabilities, workflows, knowledge types, and UI panels in YAML; Relynt validates, stores, and executes them at runtime.
+A Relynt **extension** is the integration itself — a published package that connects your systems to the platform. Extensions are built from **declarative manifests** with no server-side code in your bundle. You define capabilities, workflows, knowledge types, and UI panels in YAML; Relynt validates, stores, and executes them at runtime.
 
 ## Extension lifecycle
 
@@ -11,29 +11,30 @@ Relynt extensions let you extend the platform with **declarative manifests** —
 sequenceDiagram
   participant Dev as ExtensionBuilder
   participant CLI as relynt_CLI
-  participant Manifest as manifest_module
   participant API as Relynt_API
   participant Org as Organization
   Dev->>CLI: validate bundle
-  CLI->>Manifest: ValidateBundle
+  CLI->>CLI: validate manifests
   Dev->>CLI: push
   CLI->>API: POST /v1/extensions/bundle
-  API->>Manifest: re-validate + content hash
+  API->>API: re-validate + content hash
   Dev->>CLI: install name@version
   CLI->>API: POST /v1/extensions/install
   API->>Org: pin version + register capabilities
 ```
 
-## Manifest kinds
+## What's in an extension
 
-Every file in a bundle is a manifest with a Kubernetes-style envelope:
+An extension bundle contains one or more manifest files. Each file has a Kubernetes-style envelope with a `kind` field:
 
-| Kind | Purpose |
-|------|---------|
-| `Extension` | One or more capabilities with input/output schemas and bindings |
+| Kind | Role in the extension |
+|------|-----------------------|
+| `Extension` | Declares the extension identity and one or more capabilities with input/output schemas and bindings |
 | `Workflow` | Step graph for automation (email intake, work item triggers) |
 | `Knowledge` | Entity type definitions and sync mappings |
 | `Panel` | Declarative UI components bound with CEL expressions |
+
+The `kind: Extension` manifest sets the extension name and version used when publishing. All other manifests are companions that add workflows, knowledge, and panels to the same integration.
 
 All manifests share `apiVersion: relynt.com/v1` and kebab-case `metadata.name` values.
 
@@ -75,7 +76,7 @@ binding:
     messageId: input.messageId
 ```
 
-See [Extensions & capabilities](/extensions/manifests/extensions) for binding details.
+See [Capabilities](/extensions/manifests/extensions) for binding details.
 
 ## Related
 

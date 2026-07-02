@@ -3,7 +3,7 @@ title: "Bundle layout"
 description: "Directory structure and conventions for extension bundles."
 ---
 
-An extension bundle is a **directory of manifest files** (`.yaml`, `.yml`, or `.json`). The CLI walks the tree recursively and loads all matching files.
+An extension is published as a **bundle** — a directory of manifest files (`.yaml`, `.yml`, or `.json`) that together define the integration. The CLI walks the tree recursively and loads all matching files.
 
 ## Scaffolded layout
 
@@ -37,16 +37,16 @@ manifests/
   panel-summary.yaml
 ```
 
-## Bundle identity
+## Extension identity
 
-Push identity comes from the **Extension** manifest:
+The extension name and version used when publishing come from the `kind: Extension` manifest:
 
 | Field | Role |
 |-------|------|
 | `metadata.name` | Extension name (kebab-case) |
 | `metadata.version` | Semver for this push |
 
-All other manifests in the bundle are companions. Their `metadata.name` values are independent identifiers within the bundle.
+All other manifests in the bundle are companions — workflows, knowledge, and panels that belong to the same extension. Their `metadata.name` values are independent identifiers within the bundle.
 
 ## File naming conventions
 

@@ -16,7 +16,7 @@ description: "From local validation to org-scoped installation."
 
 ## Validation parity
 
-The CLI and server share the `github.com/getrelynt/manifest` validation library. A bundle that passes `relynt validate` will pass server validation unless you are on mismatched schema versions.
+The CLI and server use the same validation engine. A bundle that passes `relynt validate` will pass server validation unless you are on mismatched schema versions.
 
 `relynt push` validates locally before sending the HTTP request. The server re-validates on receipt.
 

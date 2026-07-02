@@ -44,15 +44,6 @@ Extension registry operations are scoped to the authenticated organization:
 
 The CLI handles token refresh automatically. For direct API integration, refresh tokens before expiry using Auth0's token endpoint.
 
-## Dev vs production
-
-| Build | Auth0 config |
-|-------|--------------|
-| Release CLI binary | Embedded at build time |
-| Dev build | `RELYNT_AUTH0_*` env vars via Doppler |
-
-See [Local development](/extensions/local-development).
-
 ## Service tokens
 
 Machine-to-machine access uses service tokens (`GET/POST /v1/service-tokens`). Service token management is outside the extensions API scope documented here.

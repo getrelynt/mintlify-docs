@@ -22,12 +22,6 @@
     }
   },
   "navbar": {
-    "links": [
-      {
-        "label": "GitHub",
-        "href": "https://github.com/getrelynt"
-      }
-    ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
@@ -173,8 +167,5 @@
     ]
   },
   "footer": {
-    "socials": {
-      "github": "https://github.com/getrelynt"
-    }
   }
 }
